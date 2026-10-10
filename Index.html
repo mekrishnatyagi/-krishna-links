@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KRISHNA TYAGI | My Links</title>
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:Arial,sans-serif;
+  background:#f5efe4;
+  color:#172744;
+  text-align:center;
+  padding:35px 18px;
+}
+.container{max-width:500px;margin:auto}
+h1{font-size:30px;letter-spacing:2px}
+p{color:#777}
+.links{margin-top:30px}
+.link{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  padding:15px;
+  margin:12px 0;
+  border-radius:14px;
+  background:#172744;
+  color:white;
+  text-decoration:none;
+  overflow-wrap:anywhere;
+}
+.link a{color:white;text-decoration:none;flex:1}
+button{
+  border:0;
+  padding:10px 14px;
+  border-radius:9px;
+  cursor:pointer;
+  font-size:16px;
+}
+.add{background:#d9c5a0;color:#172744;margin:12px}
+.remove{background:#fff;color:#172744}
+input{
+  padding:12px;
+  width:100%;
+  margin:7px 0;
+  border:1px solid #ccc;
+  border-radius:9px;
+  font-size:16px;
+}
+#form{display:none;margin-top:20px}
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>KRISHNA TYAGI</h1>
+  <p>✨ All my important links in one place ✨</p>
+
+  <button class="add" onclick="showForm()">＋ Add Link</button>
+
+  <div id="form">
+    <input id="title" placeholder="Website name">
+    <input id="url" placeholder="Website URL (https://...)">
+    <button class="add" onclick="addLink()">Save Link</button>
+    <button onclick="hideForm()">Cancel</button>
+  </div>
+
+  <div class="links" id="links"></div>
+</div>
+
+<script>
+let links = [];
+try {
+  links = JSON.parse(localStorage.getItem("krishnaLinks") || "[]");
+} catch(e) {
+  links = [];
+}
+
+function save() {
+  localStorage.setItem("krishnaLinks", JSON.stringify(links));
+}
+
+function render() {
+  const box = document.getElementById("links");
+  box.innerHTML = "";
+
+  links.forEach((item, index) => {
+    const row = document.createElement("div");
+    row.className = "link";
+
+    const a = document.createElement("a");
+    a.href = item.url;
+    a.target = "_blank";
+    a.rel = "noopener noreferrer";
+    a.textContent = "🔗 " + item.title;
+
+    const del = document.createElement("button");
+    del.className = "remove";
+    del.textContent = "✕";
+    del.onclick = () => {
+      if(confirm("Remove this link?")) {
+        links.splice(index, 1);
+        save();
+        render();
+      }
+    };
+
+    row.appendChild(a);
+    row.appendChild(del);
+    box.appendChild(row);
+  });
+}
+
+function showForm() {
+  document.getElementById("form").style.display = "block";
+}
+
+function hideForm() {
+  document.getElementById("form").style.display = "none";
+}
+
+function addLink() {
+  const title = document.getElementById("title").value.trim();
+  let url = document.getElementById("url").value.trim();
+
+  if(!title || !url) {
+    alert("Enter both the website name and URL!");
+    return;
+  }
+
+  if(!/^https?:\/\//i.test(url)) {
+    url = "https://" + url;
+  }
+
+  try {
+    const parsed = new URL(url);
+    if(!["http:", "https:"].includes(parsed.protocol)) throw Error();
+    url = parsed.href;
+  } catch(e) {
+    alert("Enter a valid website URL.");
+    return;
+  }
+
+  links.push({title, url});
+  save();
+  render();
+
+  document.getElementById("title").value = "";
+  document.getElementById("url").value = "";
+  hideForm();
+}
+
+render();
+</script>
+</body>
+</html>
